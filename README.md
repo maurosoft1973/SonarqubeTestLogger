@@ -8,7 +8,7 @@ Sonarqube xml report extension for [Visual Studio Test Platform](https://github.
 
 | Logger    | Stable Package |
 | --------- | -------------- |
-| SonarQube | [![NuGet](https://img.shields.io/nuget/v/Maurosoft.SonarqubeTestLogger.svg)](https://www.nuget.org/packages/Maurosoft.SonarqubeTestLogger/)|
+| Sonarqube | ![NuGet Version](https://img.shields.io/nuget/v/Maurosoft.SonarqubeTestLogger)|
 
 ## Usage
 
@@ -18,8 +18,9 @@ To use the logger, follow these steps:
 
 1. Add a reference to the [Sonarqube Test Logger](https://www.nuget.org/packages/Maurosoft.SonarqubeTestLogger) nuget package in test project
    ```none
+   dotnet add package Maurosoft.SonarqubeTestLogger
    ```
-1. 2. Use the following command line in tests
+2. Use the following command line in tests
    ```none
    dotnet test --logger:sonarqube
    ```
