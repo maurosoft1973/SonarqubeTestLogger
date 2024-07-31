@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <AssemblyName>Maurosoft.Sonarqube.TestLogger</AssemblyName>
+    <RootNamespace>Maurosoft.Sonarqube.TestLogger</RootNamespace>
+    <PackageId>Maurosoft.SonarqubeTestLogger</PackageId>
+    <Authors>Mauro Cardillo</Authors>
+    <Company>Mauro Cardillo</Company>
+    <Product>Maurosoft.SonarqubeTestLogger</Product>
+    <PackageProjectUrl>https://github.com/maurosoft1973/SonarqubeTestLogger</PackageProjectUrl>
+    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Copyright>Mauro Cardillo</Copyright>
+    <RepositoryUrl>https://github.com/maurosoft1973/SonarqubeTestLogger</RepositoryUrl>
+    <PackageTags>vstest;testlogger;Sonarqube</PackageTags>
+    <Description>Sonarqube test logger for vstest platform</Description>
+    <Title>Sonarqube test logger for vstest platform</Title>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" />
+    <PackageReference Include="PolyShim">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

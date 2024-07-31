@@ -1,0 +1,133 @@
+name: Build SonarqubeTestLogger Library
+on:
+  push:
+    branches: [main]
+    paths:  [ 'src/SonarqubeTestLogger/**' ]
+  pull_request:
+    branches: [main]
+    paths:  [ 'src/SonarqubeTestLogger/**' ]
+  workflow_dispatch:
+    inputs:
+      configuration:
+        type: choice
+        description: The build configuration to use in the deploy stage.
+        required: true
+        default: Release
+        options:
+          - Debug
+          - Release
+
+env:
+  TIMEZONE: 'Europe/Rome'
+  NET_VERSION: 'net8.0'
+  CONFIGURATION: 'Release'
+  PROJECT_PATH: src/SonarqubeTestLogger
+  PROJECT_NAME: SonarqubeTestLogger.csproj
+  RELEASE_NAME: SonarqubeTestLogger
+
+jobs:
+  build:
+    name: 🛠️ Build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.nbgv.outputs.SemVer2 }}
+    steps:
+      - name: Checkout
+        uses: codebeltnet/git-checkout@v1
+
+      - name: Install .NET
+        uses: codebeltnet/install-dotnet@v1
+
+      - name: Nerdbank.GitVersioning 
+        uses: dotnet/nbgv@v0.4
+        id: nbgv
+        with:
+          path: ${{ env.PROJECT_PATH }}
+
+      - name: Restore Dependencies
+        uses: codebeltnet/dotnet-restore@v1
+
+      - name: Build for ${{ env.CONFIGURATION }}
+        uses: maurosoft1973/dotnet-build@v1
+        with:
+          # Optional path to the project(s) file to restore. Pass empty to have MSBuild use the default behavior.
+          # Supports globbing.
+          projects: ${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          # Defines the build configuration.
+          configuration: ${{ env.CONFIGURATION }}
+          # Compiles for a specific framework. The framework must be defined in the project file.
+          framework: ${{ env.NET_VERSION }}
+
+  test:
+    name: 🧪 Test
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: codebeltnet/git-checkout@v1
+
+      - name: Install .NET
+        uses: codebeltnet/install-dotnet@v1
+
+      - name: Install .NET Tool - Report Generator
+        uses: codebeltnet/dotnet-tool-install-reportgenerator@v1
+
+      - name: Set Timezone ${{ env.TIMEZONE }}
+        uses: szenius/set-timezone@v2.0
+        with:
+          timezoneLinux: ${{ env.TIMEZONE }}
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore /p:ContinuousIntegrationBuild=true
+
+      - name: Test
+        run: dotnet test --configuration Debug --verbosity normal --logger trx --results-directory $RUNNER_TEMP/TestResults --collect:"XPlat Code Coverage;Format=opencover" -p:CoverletOutputFormat=opencover -p:UseSourceLink=true
+
+      - name: Use Report Generator
+        run: reportgenerator "-reports:$RUNNER_TEMP/TestResults/**/*.opencover.xml" "-targetdir:${{ github.workspace }}/Coverage" "-reporttypes:Cobertura;MarkdownSummaryGithub;HTMLInline;HTMLChart"
+
+      - name: Write to Job Summary
+        if: success() && runner.os == 'Linux'
+        run: cat ${{ github.workspace }}/Coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload CoverageReport
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoverageReport-${{ inputs.configuration }}-${{ runner.os }}-${{ hashFiles('test/**/*.csproj') }}
+          path: ${{ github.workspace }}/Coverage
+
+      - name: Upload TestResults
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults-${{ inputs.configuration }}-${{ runner.os }}-${{ hashFiles('test/**/*.csproj') }}
+          path: ${{ runner.temp }}/Coverage
+
+  pack:
+    name: 📦 Pack
+    runs-on: ubuntu-latest
+    needs: [build,test]
+    steps:     
+      - name: Pack for ${{ env.CONFIGURATION }}
+        uses: maurosoft1973/dotnet-pack@v1
+        with:
+          project: ${{ env.PROJECT_PATH }}/${{ env.PROJECT_NAME }}
+          configuration: ${{ env.CONFIGURATION }}
+          uploadPackedArtifact: true
+          version: ${{ needs.build.outputs.version }}
+
+  deploy:
+    name: 🚀 Deploy v${{ needs.build.outputs.version }}
+    runs-on: ubuntu-latest
+    needs: [build,pack,test]
+    environment: Production
+    steps:
+      - uses: maurosoft1973/nuget-push@v2
+        with:
+          source: 'https://api.nuget.org/v3/index.json'
+          token: ${{ secrets.NUGET_API_KEY }}
+          configuration: ${{ inputs.configuration == '' && 'Release' || inputs.configuration }}
