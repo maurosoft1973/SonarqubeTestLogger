@@ -24,6 +24,9 @@ env:
   PROJECT_PATH: src/SonarqubeTestLogger
   PROJECT_NAME: SonarqubeTestLogger.csproj
   RELEASE_NAME: SonarqubeTestLogger
+  SONAR_HOST: https://sonarcloud.io
+  SONAR_ORGANIZATION: maurosoft1973
+  SONAR_PROJECT: maurosoft1973_SonarqubeTestLogger
 
 jobs:
   build:
@@ -107,6 +110,42 @@ jobs:
           name: TestResults-${{ inputs.configuration }}-${{ runner.os }}-${{ hashFiles('test/**/*.csproj') }}
           path: ${{ runner.temp }}/Coverage
 
+  sonarcloud:
+    name: 🔬 Code Quality Analysis
+    needs: [build,test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: codebeltnet/git-checkout@v1
+
+      - name: Install .NET
+        uses: codebeltnet/install-dotnet@v1
+
+      - name: Install .NET Tool - Sonar Scanner
+        uses: codebeltnet/dotnet-tool-install-sonarscanner@v1
+
+      - name: Restore Dependencies
+        uses: codebeltnet/dotnet-restore@v1
+
+      - name: Run SonarCloud Analysis
+        uses: codebeltnet/sonarcloud-scan@v1
+        with:
+          host: ${{ env.SONAR_HOST }}
+          organization:  ${{ env.SONAR_ORGANIZATION }}
+          projectKey:  ${{ env.SONAR_PROJECT }}
+          version: ${{ needs.build.outputs.version }}
+          token: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build
+        uses: maurosoft1973/dotnet-build@v1
+        with:
+          uploadBuildArtifact: false
+
+      - name: Finalize SonarCloud Analysis
+        uses: codebeltnet/sonarcloud-scan-finalize@v1
+        with:
+          token: ${{ secrets.SONAR_TOKEN }}
+
   pack:
     name: 📦 Pack
     runs-on: ubuntu-latest
@@ -123,7 +162,7 @@ jobs:
   deploy:
     name: 🚀 Deploy v${{ needs.build.outputs.version }}
     runs-on: ubuntu-latest
-    needs: [build,pack,test]
+    needs: [build,test,pack]
     environment: Production
     steps:
       - uses: maurosoft1973/nuget-push@v2
