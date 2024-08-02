@@ -1,25 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
-    <AssemblyName>Maurosoft.Sonarqube.TestLogger</AssemblyName>
-    <RootNamespace>Maurosoft.Sonarqube.TestLogger</RootNamespace>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>1.0.1</Version>
+    <AssemblyName>SonarqubeTestLogger</AssemblyName>
     <PackageId>Maurosoft.SonarqubeTestLogger</PackageId>
+    <Product>SonarqukeTestLogger</Product>
+    <Title>SonarqubeTestLogger</Title>
+    <Description>Sonarqube test logger for vstest platform</Description>
     <Authors>Mauro Cardillo</Authors>
     <Company>Mauro Cardillo</Company>
-    <Product>Maurosoft.SonarqubeTestLogger</Product>
-    <PackageProjectUrl>https://github.com/maurosoft1973/SonarqubeTestLogger</PackageProjectUrl>
-    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
-    <LangVersion>latest</LangVersion>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Copyright>Mauro Cardillo</Copyright>
-    <RepositoryUrl>https://github.com/maurosoft1973/SonarqubeTestLogger</RepositoryUrl>
-    <PackageTags>vstest;testlogger;Sonarqube</PackageTags>
-    <Description>Sonarqube test logger for vstest platform</Description>
-    <Title>Sonarqube test logger for vstest platform</Title>
-    <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <PackageTags>vstest;testlogger;Sonarqube</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/maurosoft1973/SonarqubeTestLogger</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/maurosoft1973/SonarqubeTestLogger.git</RepositoryUrl>
+    <RepositoryBranch>master</RepositoryBranch>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +29,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="icon.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,10 +6,7 @@ namespace SonarqubeTestLogger.Test.Common;
 
 internal static class TestLoggerContextExtensions
 {
-    public static void SimulateTestRun(
-        this TestLoggerContext context,
-        params Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult[] testResults
-    )
+    public static void SimulateTestRun(this TestLoggerContext context, params Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult[] testResults)
     {
         foreach (var testResult in testResults)
             context.HandleTestResult(new TestResultEventArgs(testResult));

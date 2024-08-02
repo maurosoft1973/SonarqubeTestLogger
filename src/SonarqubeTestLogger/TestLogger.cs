@@ -12,19 +12,24 @@ public class TestLogger : ITestLoggerWithParameters
 {
     public const string FriendlyName = "sonarqube";
 
-    public TestLoggerContext Context { get; private set; }
+    public TestLoggerContext? Context { get; private set; }
+
+    public const string DefaultTestResultFile = "SonarqubeReportTest.xml";
+
+    public IConsoleK ConsoleK { get; set; } = new ConsoleK();
 
     private void Initialize(TestLoggerEvents events, TestLoggerOptions options)
     {
         if (options.Verbose)
         {
-            Console.WriteLine($"{FriendlyName} - Start");
-            Console.WriteLine($"{FriendlyName} - LogFilePath      -> {options.LogFilePath}");
-            Console.WriteLine($"{FriendlyName} - OutputFilePath   -> {Path.GetFullPath(options.LogFilePath)}");
-            Console.WriteLine($"{FriendlyName} - PathSourcesTest: -> {(string.IsNullOrEmpty(options.PathTestProject) ? options.PathTestProject : Environment.CurrentDirectory)}");
+            ConsoleK.WriteLine($"{FriendlyName} - Start");
+            ConsoleK.WriteLine($"{FriendlyName} - LogFileName      -> {options.LogFileName}");
+            ConsoleK.WriteLine($"{FriendlyName} - LogFilePath      -> {options.LogFilePath}");
+            ConsoleK.WriteLine($"{FriendlyName} - TestRunDirectory -> {options.TestRunDirectory}");
+            ConsoleK.WriteLine($"{FriendlyName} - PathSourcesTest: -> {(string.IsNullOrEmpty(options.PathTestProject) ? options.PathTestProject : Environment.CurrentDirectory)}");
         }
 
-        var context = new TestLoggerContext(options);
+        var context = new TestLoggerContext(options, ConsoleK);
 
         events.TestResult += (_, args) => context.HandleTestResult(args);
         events.TestRunComplete += (_, args) => context.HandleTestRunComplete(args);
@@ -32,9 +37,25 @@ public class TestLogger : ITestLoggerWithParameters
         Context = context;
     }
 
-    public void Initialize(TestLoggerEvents events, string testRunDirectory) =>
-        Initialize(events, new TestLoggerOptions() { LogFilePath = Path.Combine(testRunDirectory, "SonarQubeReportTest.xml") });
+    public void Initialize(TestLoggerEvents events, string testRunDirectory)
+    {
+        if (events == null)
+            throw new ArgumentNullException(nameof(events));
 
-    public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters) =>
+        if (testRunDirectory == null)
+            throw new ArgumentNullException(nameof(testRunDirectory));
+
+        var config = new Dictionary<string, string?>
+        {
+            { DefaultLoggerParameterNames.TestRunDirectory, testRunDirectory },
+            { DefaultLoggerParameterNames.TargetFramework, "" },
+        };
+
+        Initialize(events, config);
+    }
+
+    public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
+    {
         Initialize(events, TestLoggerOptions.Resolve(parameters));
+    }
 }

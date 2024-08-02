@@ -76,7 +76,7 @@ public static class ExtensionMethod
             }
         }
 
-        return source;
+        return source ?? [];
     }
 
     public static bool ContainsInPath(this string pathFile, string[] subdirectories)
