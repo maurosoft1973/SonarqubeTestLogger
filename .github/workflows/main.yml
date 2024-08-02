@@ -51,7 +51,7 @@ jobs:
         uses: codebeltnet/dotnet-restore@v1
 
       - name: Build for ${{ env.CONFIGURATION }}
-        uses: maurosoft1973/dotnet-build@v1
+        uses: maurosoft1973/dotnet-build@v2
         with:
           # Optional path to the project(s) file to restore. Pass empty to have MSBuild use the default behavior.
           # Supports globbing.
@@ -137,7 +137,7 @@ jobs:
           token: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build
-        uses: maurosoft1973/dotnet-build@v1
+        uses: maurosoft1973/dotnet-build@v2
         with:
           uploadBuildArtifact: false
 
