@@ -8,7 +8,7 @@ Sonarqube xml report extension for [Visual Studio Test Platform](https://github.
 
 | Logger    | Stable Package |
 | --------- | -------------- |
-| Sonarqube | ![NuGet Version](https://img.shields.io/nuget/v/Maurosoft.SonarqubeTestLogger)|
+| Sonarqube | [![NuGet Version](https://img.shields.io/nuget/v/Maurosoft.SonarqubeTestLogger)](https://www.nuget.org/packages/Maurosoft.SonarqubeTestLogger/)|
 
 ## Usage
 

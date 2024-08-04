@@ -11,6 +11,9 @@ public class TestLoggerContextTest
     [TestInitialize]
     public void TestInitialize()
     {
+        if (File.Exists(Path.Combine(AppContext.BaseDirectory, "SonarqubeReportTest.xml")))
+            File.Delete(Path.Combine(AppContext.BaseDirectory, "SonarqubeReportTest.xml"));
+
         var source1 =
             @"
             using Microsoft.VisualStudio.TestPlatform.ObjectModel;

@@ -5,7 +5,6 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.0.1</Version>
     <AssemblyName>SonarqubeTestLogger</AssemblyName>
     <PackageId>Maurosoft.SonarqubeTestLogger</PackageId>
     <Product>SonarqukeTestLogger</Product>

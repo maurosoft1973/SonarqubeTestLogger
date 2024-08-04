@@ -38,7 +38,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
 
             if (Options.Verbose)
                 foreach (var testResultFullyFullyQualifiedName in testResultFullyFullyQualifiedNames)
-                    _console.WriteLine($"{TestLogger.FriendlyName} - Found Test with Namespace -> {testResultFullyFullyQualifiedName.Namespace}, ClassName -> {testResultFullyFullyQualifiedName.Class}, MethodName -> {testResultFullyFullyQualifiedName.Method} from TestResults");
+                    _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Found Test with Namespace -> {testResultFullyFullyQualifiedName.Namespace}, ClassName -> {testResultFullyFullyQualifiedName.Class}, MethodName -> {testResultFullyFullyQualifiedName.Method} from TestResults");
 
             var sourceFilePath = !string.IsNullOrEmpty(Options.PathTestProject) ? Options.PathTestProject : Environment.CurrentDirectory;
 
@@ -48,7 +48,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                         .Where(p => !p.ContainsInPath(subDirectories)).ToArray();
 
             if (files.Length == 0)
-                _console.WriteLine($"{TestLogger.FriendlyName} - No source files found for {sourceFilePath}, Skip generation report");
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - No source files found for {sourceFilePath}, Skip generation report");
 
             Dictionary<string, string> results = [];
 
@@ -66,7 +66,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                 else
                 {
                     if (Options.Verbose)
-                        _console.WriteLine($"{TestLogger.FriendlyName} - No test found with namespace:{testResultFullyFullyQualifiedName.Namespace}, classname:{testResultFullyFullyQualifiedName.Class}, methodname: {testResultFullyFullyQualifiedName.Method}");
+                        _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - No test found with namespace:{testResultFullyFullyQualifiedName.Namespace}, classname:{testResultFullyFullyQualifiedName.Class}, methodname: {testResultFullyFullyQualifiedName.Method}");
                 }
             }
 
@@ -116,7 +116,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
             sb.AppendLine("</testExecutions>");
 
             if (Options.Verbose)
-                _console.WriteLine($"{TestLogger.FriendlyName} - Total Tests: {totalTest}");
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Total Tests: {totalTest}");
 
             var outputFilePath = "";
             var outputFileName = !string.IsNullOrEmpty(Options.LogFileName) ? Options.LogFileName : TestLogger.DefaultTestResultFile;
@@ -132,7 +132,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                     {
                         Directory.CreateDirectory(parentDirectory);
                         if (Options.Verbose)
-                            _console.WriteLine($"{TestLogger.FriendlyName} - Successful directory creation: {parentDirectory}");
+                            _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Successful directory creation: {parentDirectory}");
                     }
 
                     outputFilePath = Options.LogFilePath;
@@ -140,7 +140,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                 catch (Exception ex)
                 {
                     if (Options.Verbose)
-                        _console.WriteLine($"{TestLogger.FriendlyName} - An error occurred when creating the directory tree {Options.LogFilePath}: {ex.Message}");
+                        _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - An error occurred when creating the directory tree {Options.LogFilePath}: {ex.Message}");
                 }
             }
 
@@ -150,10 +150,28 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                 _ => Path.GetFullPath(Options.LogFilePath),
             };
 
-            File.WriteAllText(outputReportFilePath, sb.ToString());
+            if (File.Exists(outputReportFilePath))
+            {
+                if (Options.Verbose)
+                    _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - The report file {outputReportFilePath} exist, generate new file");
+
+                var tmpOutputBaseReport = Path.GetFileNameWithoutExtension(outputReportFilePath);
+                var tmpOutputReportPath = Path.GetDirectoryName(outputReportFilePath);
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - OutputBaseReport {tmpOutputBaseReport}");
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - OutputReportPath {tmpOutputReportPath}");
+
+                var totalFiles = Directory.GetFiles(tmpOutputReportPath, tmpOutputBaseReport + "-*.xml");
+                var instance = totalFiles.Length + 1;
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Total Reports Files {totalFiles.Length}");
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Report File Path Rewrite {Path.Combine(tmpOutputReportPath, tmpOutputBaseReport + "-" + instance.ToString("000") + ".xml")}");
+
+                File.WriteAllText(Path.Combine(tmpOutputReportPath, tmpOutputBaseReport + "-" + instance.ToString("000") + ".xml"), sb.ToString());
+            }
+            else
+                File.WriteAllText(outputReportFilePath, sb.ToString());
 
             if (Options.Verbose)
-                _console.WriteLine($"{TestLogger.FriendlyName} - End");
+                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - End");
         }
 
         (bool found, string file) Search(string[] files, string namespaceName, string className, string methodName)
@@ -166,14 +184,14 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
             foreach (var file in files)
             {
                 if (Options.Verbose)
-                    _console.WriteLine($"{TestLogger.FriendlyName} - Search test with namespace:{namespaceName}, classname:{className}, methodname: {methodName} from source file -> {file}");
+                    _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Search test with namespace:{namespaceName}, classname:{className}, methodname: {methodName} from source file -> {file}");
 
                 var sourceLinesFile = System.IO.File.ReadAllLines(file);
 
                 sourceLinesFile.ForEach((sourceLineFile) => sourceLineFile.Contains(namespaceName), (sourceLineFile, i) =>
                 {
                     if (Options.Verbose)
-                        _console.WriteLine($"{TestLogger.FriendlyName} - Found Namespace {namespaceName} into file {file} at line {i}");
+                        _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Found Namespace {namespaceName} into file {file} at line {i}");
 
                     foundNamespace = true;
                     fileName = file;
@@ -184,7 +202,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                     sourceLinesFile.ForEach((sourceLineFile) => sourceLineFile.Contains(className), (sourceLineFile, i) =>
                     {
                         if (Options.Verbose)
-                            _console.WriteLine($"{TestLogger.FriendlyName} - Found Class {className} into file {file} at line {i}");
+                            _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Found Class {className} into file {file} at line {i}");
 
                         foundClass = true;
                     }, true);
@@ -193,7 +211,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                         sourceLinesFile.ForEach((sourceLineFile) => sourceLineFile.Contains(methodName), (sourceLineFile, i) =>
                         {
                             if (Options.Verbose)
-                                _console.WriteLine($"{TestLogger.FriendlyName} - Found Method {methodName} into file {file} at line {i}");
+                                _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Found Method {methodName} into file {file} at line {i}");
 
                             foundMethod = true;
                         }, true);
@@ -201,7 +219,7 @@ public class TestLoggerContext(TestLoggerOptions options, IConsoleK console)
                     {
                         if (Options.Verbose)
                         {
-                            _console.WriteLine($"{TestLogger.FriendlyName} - Not Found Class {className} into file {file}, Try next file");
+                            _console.WriteLine($"{TestLogger.FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Not Found Class {className} into file {file}, Try next file");
                         }
                     }
                 }

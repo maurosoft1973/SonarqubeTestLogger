@@ -22,11 +22,11 @@ public class TestLogger : ITestLoggerWithParameters
     {
         if (options.Verbose)
         {
-            ConsoleK.WriteLine($"{FriendlyName} - Start");
-            ConsoleK.WriteLine($"{FriendlyName} - LogFileName      -> {options.LogFileName}");
-            ConsoleK.WriteLine($"{FriendlyName} - LogFilePath      -> {options.LogFilePath}");
-            ConsoleK.WriteLine($"{FriendlyName} - TestRunDirectory -> {options.TestRunDirectory}");
-            ConsoleK.WriteLine($"{FriendlyName} - PathSourcesTest: -> {(string.IsNullOrEmpty(options.PathTestProject) ? options.PathTestProject : Environment.CurrentDirectory)}");
+            ConsoleK.WriteLine($"{FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Start");
+            ConsoleK.WriteLine($"{FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - LogFileName      -> {options.LogFileName}");
+            ConsoleK.WriteLine($"{FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - LogFilePath      -> {options.LogFilePath}");
+            ConsoleK.WriteLine($"{FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - TestRunDirectory -> {options.TestRunDirectory}");
+            ConsoleK.WriteLine($"{FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - PathSourcesTest: -> {(string.IsNullOrEmpty(options.PathTestProject) ? options.PathTestProject : Environment.CurrentDirectory)}");
         }
 
         var context = new TestLoggerContext(options, ConsoleK);
@@ -56,6 +56,12 @@ public class TestLogger : ITestLoggerWithParameters
 
     public void Initialize(TestLoggerEvents events, Dictionary<string, string?> parameters)
     {
+        Boolean.TryParse(parameters.GetValueOrDefault("Verbose", "false"), out var verbose);
+
+        if (verbose)
+            foreach (var key in parameters.Keys)
+                ConsoleK.WriteLine($"{FriendlyName}:{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} - Parameter {key} -> {parameters.GetValueOrDefault(key, "-")}");
+
         Initialize(events, TestLoggerOptions.Resolve(parameters));
     }
 }

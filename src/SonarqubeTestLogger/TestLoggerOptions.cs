@@ -21,9 +21,9 @@ public partial class TestLoggerOptions
         {
             LogFileName = parameters.GetValueOrDefault("LogFileName") ?? "",
             LogFilePath = parameters.GetValueOrDefault("LogFilePath") ?? "",
-            TestRunDirectory = parameters.GetValueOrDefault(DefaultLoggerParameterNames.TestRunDirectory) ?? "",
+            TestRunDirectory = parameters.GetValueOrDefault(DefaultLoggerParameterNames.TestRunDirectory) ?? Environment.CurrentDirectory,
             PathTestProject = parameters.GetValueOrDefault("PathTestProject") ?? Environment.CurrentDirectory,
             PathsExcluded = parameters.GetValueOrDefault("PathsExcluded") ?? "bin,obj",
-            Verbose = Convert.ToBoolean(parameters.GetValueOrDefault("Verbose") ?? "false")
+            Verbose = Convert.ToBoolean(parameters.GetValueOrDefault("Verbose", "false") ?? "false")
         };
 }
