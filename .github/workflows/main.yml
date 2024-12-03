@@ -22,7 +22,7 @@ env:
   CONFIGURATION: 'Release'
   PROJECT_PATH: src/SonarqubeTestLogger
   PROJECT_NAME: SonarqubeTestLogger.csproj
-  PACKAGE_NAME: SonarqubeTestLogger
+  PACKAGE_NAME: Maurosoft.SonarqubeTestLogger
   BUILD_ARTIFACT: SonarqubeTestLogger
 
 jobs:
